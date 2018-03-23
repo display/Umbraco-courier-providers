@@ -143,8 +143,16 @@
                                 string serializedValue = firstDataType.Value as string ??
                                                          JsonConvert.SerializeObject(firstDataType.Value);
 
-
-                                ncObj[propertyType.Alias] = new JValue(serializedValue);
+                                try
+                                {
+                                    // attempt to parse in case of valid json object
+                                    ncObj[propertyType.Alias] = JToken.Parse(serializedValue);
+                                }
+                                catch(JsonReaderException ex)
+                                {
+                                    // revert to JValue
+                                    ncObj[propertyType.Alias] = new JValue(serializedValue);
+                                }
 
                                 // (if packaging) add a dependency for the property's data-type
                                 if (direction == Direction.Packaging)
